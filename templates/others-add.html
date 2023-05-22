@@ -1,0 +1,55 @@
+{% extends "forumlayout.html" %}
+{% block title %} Others - Add New Post{% endblock %}
+{% block content %}
+    <!-- Background image -->
+    <div
+        class = "p-5 text-center bg-image"
+        style = "
+            background-image: url('https://mdbcdn.b-cdn.net/img/new/slides/041.webp');
+            height: 400px;
+            margin-top: 58px;
+            "
+        >
+        <div class = "mask" style = "background-color: rgba(0, 0, 0, 0.6);">
+            <div class = "d-flex justify-content-center align-items-center h-100">
+                <div class = "text-white">
+                    <h1 class = "mb-3">Forum - Others</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Background image -->
+    <div class = "container py-3">
+        <div class = "card text-center">
+            <div class = "card-body">
+                <h5 class = "card-title">Posting Guidelines - Read before submitting </h5>
+                <p class = "card-text">
+                    <ol class = "list-group list-group-light list-group-numbered">
+                        <li class = "list-group-item">Please be respectful</li>
+                        <li class = "list-group-item">We are not responsible for any negative consequences resulting from a user's breach of conduct</li>
+                        <li class = "list-group-item">Please only include non-comprising contact information if you wish for other users to contact you</li>
+                    </ol>
+              </p>
+            </div>
+        </div>
+        <br>
+        <h4 class = "text-center py-3">Add New Post</h4>
+        <form method = "POST" action = "{{ url_for('others_add') }}">
+            <div class = "form-outline mb-4">
+                <input type = "text" name = "title" class = form-control>
+                <label class = "form-label">Title</label>
+            </div>
+            <div class = "form-outline mb-4">
+                <input type = "text" name = "nickname" class = form-control>
+                <label class = "form-label">Nickname</label>
+            </div>
+            <div class = "form-outline mb-4">
+                <textarea class = "form-control" name = "description" cols = "40" rows = "15"></textarea>
+                <label class = "form-label" for = "form4Example3">Description</label>
+            </div>
+            <button type = "submit" class = "btn btn-dark btn-block mb-4" name = "submit">Submit</button>
+            <br>
+        </form>
+        <a href = "{{ url_for('others_all') }}" class = "btn btn-dark">Back to Forum - others</a>
+    </div>
+{% endblock %}

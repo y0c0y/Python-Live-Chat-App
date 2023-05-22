@@ -1,0 +1,36 @@
+{% extends "forumlayout.html" %}
+{% block title %} Forum {% endblock %}
+{% block content %}
+    <!-- Background image -->
+    <div
+        class = "p-5 text-center bg-image"
+        style = "
+            background-image: url('https://mdbcdn.b-cdn.net/img/new/slides/041.webp');
+            height: 400px;
+            margin-top: 58px;
+            "
+        >
+        <div class = "mask" style = "background-color: rgba(0, 0, 0, 0.6);">
+            <div class = "d-flex justify-content-center align-items-center h-100">
+                <div class = "text-white">
+                    <h1 class = "mb-3">Forum - Index</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Background image -->
+    <!-- Menu -->
+    <br>
+    <div class = "container">
+        <h6 class = "bg-light p-2 border-top border-bottom">Discussion</h6>
+        <div class = "list-group list-group-light">
+            <a href = "{{ url_for('general_all') }}" class = "list-group-item list-group-item-action px-3 border-0">General</a>
+            <a href = "{{ url_for('fstudygroups_all') }}" class = "list-group-item list-group-item-action px-3 border-0">Find Study Groups</a>
+        </div>
+        <h6 class = "bg-light p-2 border-top border-bottom">Languages</h6>
+        <div class = "list-group list-group-light">
+            <a href = "{{ url_for('english_all') }}" class = "list-group-item list-group-item-action px-3 border-0">English</a>
+            <a href = "{{ url_for('korean_all') }}" class = "list-group-item list-group-item-action px-3 border-0">Korean</a>
+            <a href = "{{ url_for('others_all') }}" class = "list-group-item list-group-item-action px-3 border-0">Others</a>
+    </div>
+{% endblock %}
