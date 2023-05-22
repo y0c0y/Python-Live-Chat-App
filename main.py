@@ -3,7 +3,12 @@ from flask_socketio import join_room, leave_room, send, SocketIO
 import random
 from string import ascii_uppercase
 
+import pymongo
+import bcrypt
+
 app = Flask(__name__)
+
+#webchat
 app.config["SECRET_KEY"] = "hjhjsdahhds"
 socketio = SocketIO(app)
 
@@ -98,6 +103,51 @@ def disconnect():
     
     send({"name": name, "message": "has left the room"}, to=room)
     print(f"{name} has left the room {room}")
+
+#login
+
+
+client = pymongo.MongoClient("mongodb://localhost:27017/")
+db = client.get_database('total_records')
+records = db.register
+
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    message = 'Please login to your account'
+    if "email" in session:
+        return redirect(url_for("logged_in"))
+
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+
+       
+        email_found = records.find_one({"email": email})
+        if email_found:
+            email_val = email_found['email']
+            passwordcheck = email_found['password']
+            
+            if bcrypt.checkpw(password.encode('utf-8'), passwordcheck):
+                session["email"] = email_val
+                return redirect(url_for('logged_in'))
+            else:
+                if "email" in session:
+                    return redirect(url_for("logged_in"))
+                message = 'Wrong password'
+                return render_template('login.html', message=message)
+        else:
+            message = 'Email not found'
+            return render_template('login.html', message=message)
+    return render_template('login.html', message=message)
+
+
+@app.route("/logout", methods=["POST", "GET"])
+def logout():
+    if "email" in session:
+        session.pop("email", None)
+        return render_template("signout.html")
+    else:
+        return render_template('index.html')
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
