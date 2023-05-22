@@ -8,22 +8,24 @@ import bcrypt
 
 app = Flask(__name__)
 
-#webchat
+# webchat
 app.config["SECRET_KEY"] = "hjhjsdahhds"
 socketio = SocketIO(app)
 
 rooms = {}
+
 
 def generate_unique_code(length):
     while True:
         code = ""
         for _ in range(length):
             code += random.choice(ascii_uppercase)
-        
+
         if code not in rooms:
             break
-    
+
     return code
+
 
 @app.route("/", methods=["POST", "GET"])
 def home():
@@ -35,23 +37,30 @@ def home():
         create = request.form.get("create", False)
 
         if not name:
-            return render_template("home.html", error="Please enter a name.", code=code, name=name)
+            return render_template(
+                "home.html", error="Please enter a name.", code=code, name=name
+            )
 
         if join != False and not code:
-            return render_template("home.html", error="Please enter a room code.", code=code, name=name)
-        
+            return render_template(
+                "home.html", error="Please enter a room code.", code=code, name=name
+            )
+
         room = code
         if create != False:
             room = generate_unique_code(4)
             rooms[room] = {"members": 0, "messages": []}
         elif code not in rooms:
-            return render_template("home.html", error="Room does not exist.", code=code, name=name)
-        
+            return render_template(
+                "home.html", error="Room does not exist.", code=code, name=name
+            )
+
         session["room"] = room
         session["name"] = name
         return redirect(url_for("room"))
 
     return render_template("home.html")
+
 
 @app.route("/room")
 def room():
@@ -61,19 +70,18 @@ def room():
 
     return render_template("room.html", code=room, messages=rooms[room]["messages"])
 
+
 @socketio.on("message")
 def message(data):
     room = session.get("room")
     if room not in rooms:
-        return 
-    
-    content = {
-        "name": session.get("name"),
-        "message": data["data"]
-    }
+        return
+
+    content = {"name": session.get("name"), "message": data["data"]}
     send(content, to=room)
     rooms[room]["messages"].append(content)
     print(f"{session.get('name')} said: {data['data']}")
+
 
 @socketio.on("connect")
 def connect(auth):
@@ -84,11 +92,12 @@ def connect(auth):
     if room not in rooms:
         leave_room(room)
         return
-    
+
     join_room(room)
     send({"name": name, "message": "has entered the room"}, to=room)
     rooms[room]["members"] += 1
     print(f"{name} joined room {room}")
+
 
 @socketio.on("disconnect")
 def disconnect():
@@ -100,20 +109,22 @@ def disconnect():
         rooms[room]["members"] -= 1
         if rooms[room]["members"] <= 0:
             del rooms[room]
-    
+
     send({"name": name, "message": "has left the room"}, to=room)
     print(f"{name} has left the room {room}")
 
-#login
+
+# login
 
 
 client = pymongo.MongoClient("mongodb://localhost:27017/")
-db = client.get_database('total_records')
-records = db.register
+log_db = client.get_database("total_records")
+records = log_db.register
+
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
-    message = 'Please login to your account'
+    message = "Please login to your account"
     if "email" in session:
         return redirect(url_for("logged_in"))
 
@@ -121,24 +132,23 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
 
-       
         email_found = records.find_one({"email": email})
         if email_found:
-            email_val = email_found['email']
-            passwordcheck = email_found['password']
-            
-            if bcrypt.checkpw(password.encode('utf-8'), passwordcheck):
+            email_val = email_found["email"]
+            passwordcheck = email_found["password"]
+
+            if bcrypt.checkpw(password.encode("utf-8"), passwordcheck):
                 session["email"] = email_val
-                return redirect(url_for('logged_in'))
+                return redirect(url_for("logged_in"))
             else:
                 if "email" in session:
                     return redirect(url_for("logged_in"))
-                message = 'Wrong password'
-                return render_template('login.html', message=message)
+                message = "Wrong password"
+                return render_template("login.html", message=message)
         else:
-            message = 'Email not found'
-            return render_template('login.html', message=message)
-    return render_template('login.html', message=message)
+            message = "Email not found"
+            return render_template("login.html", message=message)
+    return render_template("login.html", message=message)
 
 
 @app.route("/logout", methods=["POST", "GET"])
@@ -147,7 +157,8 @@ def logout():
         session.pop("email", None)
         return render_template("signout.html")
     else:
-        return render_template('index.html')
+        return render_template("index.html")
+
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
