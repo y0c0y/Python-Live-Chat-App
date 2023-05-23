@@ -116,6 +116,81 @@ client = MongoClient(
 log_db = client.get_database("total_records")
 records = log_db.register
 
+@app.route("/signup", methods=['post', 'get'])
+def signup():
+    message = ''
+    if "email" in session:
+        return redirect(url_for("logged_in"))
+    if request.method == "POST":
+        user = request.form.get("nickname")
+        email = request.form.get("email")
+        birthday = request.form.get("birthday")
+        gender = request.form.get("gender")
+        available = request.form.get("available")
+        learning = request.form.get("learning")
+        password1 = request.form.get("password1")
+        password2 = request.form.get("password2")
+        profileimg = request.form.get("profileimg")
+        
+        user_found = records.find_one({"nickname": user})
+        email_found = records.find_one({"email": email})
+        if not user:
+            message = 'Please make sure that you write your nickname.'
+            return render_template('index.html', message=message)
+        if not email:
+            message = 'Please make sure that you write your firstname.'
+            return render_template('index.html', message=message)
+        if not birthday:
+            message = 'Please make sure that you write your birthday.'
+            return render_template('index.html', message=message)
+        if not gender:
+            message = 'Please make sure that you write your gender.'
+            return render_template('index.html', message=message)
+        if not available:
+            message = 'Please make sure that you write your available language.'
+            return render_template('index.html', message=message)
+        if not learning:
+            message = 'Please make sure that you write your learning language.'
+            return render_template('index.html', message=message)
+        if not password1:
+            message = 'Please make sure that you write your password.'
+            return render_template('index.html', message=message)
+        if not password2:
+            message = 'Please make sure that you write your password.'
+            return render_template('index.html', message=message)
+        # if not profileimg:
+        #     message = 'Please make sure that you selected your profile image.'
+        #     return render_template('index.html', message=message)
+        
+
+
+        if user_found:
+            message = 'There already is a user by that name'
+            return render_template('index.html', message=message)
+        if email_found:
+            message = 'This email already exists in database'
+            return render_template('index.html', message=message)
+        if password1 != password2:
+            message = 'Passwords should match!'
+            return render_template('index.html', message=message)
+        else:
+            hashed = bcrypt.hashpw(password2.encode('utf-8'), bcrypt.gensalt())
+            user_input = {'name': user, 
+                          'birthday':birthday, 
+                          'email': email, 
+                          'gender': gender,
+                          'available' : available,
+                          'learning' : learning,
+                          'password': hashed,
+                          'profileimg' : profileimg
+                          }
+            records.insert_one(user_input)
+            
+            user_data = records.find_one({"email": email})
+            new_email = user_data['email']
+   
+            return render_template('logged_in.html', email=new_email)
+    return render_template('signup.html')
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
