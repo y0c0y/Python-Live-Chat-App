@@ -1,0 +1,19 @@
+{% extends "weblayoutactive.html" %}
+{% block title %} Lingua Sejong - Forum {% endblock %}
+{% block text %} Forum -Index {% endblock %}
+{% block content %}
+    <!-- Menu -->
+    <br>
+    <div class = "container">
+        <h6 class = "bg-light p-2 border-top border-bottom">Discussion</h6>
+        <div class = "list-group list-group-light">
+            <a href = "{{ url_for('general_all') }}" class = "list-group-item list-group-item-action px-3 border-0">General</a>
+            <a href = "{{ url_for('fstudygroups_all') }}" class = "list-group-item list-group-item-action px-3 border-0">Find Study Groups</a>
+        </div>
+        <h6 class = "bg-light p-2 border-top border-bottom">Languages</h6>
+        <div class = "list-group list-group-light">
+            <a href = "{{ url_for('english_all') }}" class = "list-group-item list-group-item-action px-3 border-0">English</a>
+            <a href = "{{ url_for('korean_all') }}" class = "list-group-item list-group-item-action px-3 border-0">Korean</a>
+            <a href = "{{ url_for('others_all') }}" class = "list-group-item list-group-item-action px-3 border-0">Others</a>
+    </div>
+{% endblock %}

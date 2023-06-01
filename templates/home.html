@@ -1,0 +1,55 @@
+{% extends "weblayout.html" %}
+{% block title %} Lingua Sejong - Home {% endblock %}
+{% block content %}
+    <!-- Background image -->
+    <div
+        class = "p-5 text-center bg-image"
+        style = "
+            background-image: url('static/img/background.jpg');
+            height: 300px;
+            margin-top: 55px;
+            "
+        >
+        <div class = "mask" style = "background-color: rgba(0, 0, 0, 0.6);">
+            <div class = "d-flex justify-content-center align-items-center h-100">
+                <div class = "text-white">
+                    <h1 class = "mb-3">Welcome to Lingua Sejong!</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Background image -->
+    <div class = "row p-3" id = "intro">
+        <div class = "col-md-6 p-3">
+            <div class = "card text-center">
+                <div class = "card-body">
+                    <h5 class = "card-title">Lingua Sejong</h5>
+                    <p class = "card-text">
+                        Welcome to Lingua Sejong where you can connect with your peers and embark on your language learning journey. 
+                        Use our chat rooms to search for and connect with members with learning goals similar to your own or join study groups to study your preferred language with multiple members. 
+                        Sign in or register to get started!
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class = "col-md-6 p-3">
+            <form action = "" method = "POST">
+                <div class = "form-outline mb-4">
+                    <input name = "email" class = "form-control" id = "inputEmail"  placeholder = "Enter Email">
+                </div>
+                <div class = "form-outline mb-4">
+                    <input type = "password" name = "password" class = "form-control" id = "inputPassword" placeholder = "Enter Password">
+                </div>
+                <button type = "submit" class = "btn btn-dark btn-block mb-4" name = "submit">Sign in</button>
+            </form>
+            {% for message in get_flashed_messages() %}
+                <div class = "alert alert-info alert-dismissible fade show" role = "alert">
+                    {{ message }}
+                    <button type = "button" class = "btn-close" data-mdb-dismiss = "alert" aria-label = "Close"></button>
+                </div>
+            {% endfor %}
+            <a href = "{{ url_for('register')}}" class = "btn btn-dark btn-block mb-4">Register</a>
+        </div>
+    </div>
+    </div>
+{% endblock %}

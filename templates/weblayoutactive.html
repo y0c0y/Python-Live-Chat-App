@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang = "en">
+  <head>
+    <meta charset = "UTF-8" />
+    <meta name = "viewport" content = "width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta http-equiv = "x-ua-compatible" content = "ie=edge"/>
+    <title>{% block title %} Web Page Layout Active {% endblock %}</title>
+    <!-- Website icon -->
+    <link rel = "icon" href = "{{ url_for('static', filename='img/favicon.ico') }}" type = "image/x-icon"/>
+    <!-- Font Awesome -->
+    <link
+      rel = "stylesheet"
+      href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <!-- Google Fonts Roboto -->
+    <link
+      rel = "stylesheet"
+      href = "https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"
+    />
+    <!-- MDB -->
+    <link rel = "stylesheet" href = "{{ url_for('static', filename='css/mdb.min.css') }}"/>
+  </head>
+  <body>
+    <header>
+      <!-- Navbar-->
+      <nav class = "navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class = "container-fluid justify-content-between">
+          <!-- Left elements -->
+          <div class = "d-flex">
+            <!-- Brand -->
+            <a class = "navbar-brand me-2 mb-1 d-flex align-items-center" href = "#">
+              <img
+                src = "{{ url_for('static', filename='img/languages.png') }}"
+                height = "20"
+                alt = "Logo"
+                loading = "lazy"
+                style = "margin-top: 2px;"
+              />
+            </a>
+            <!-- Left links -->
+            <ul class = "navbar-nav me-auto mb-2 mb-lg-0">
+              <li class = "nav-item">
+                <a class = "nav-link" href = "#">Search Members</a>
+              </li>
+              <!-- Dropdown -->
+              <li class = "nav-item dropdown">
+                <a
+                  class = "nav-link dropdown-toggle"
+                  href = "#"
+                  id = "navbarDropdownMenuLink"
+                  role = "button"
+                  data-mdb-toggle = "dropdown"
+                  aria-expanded = "false"
+                >
+                  Forum
+                </a>
+                <ul class = "dropdown-menu" aria-labelledby = "navbarDropdownMenuLink">
+                  <li>
+                    <a class = "dropdown-item" href = "{{ url_for('forumhome') }}">Index</a>
+                  </li>
+                  <li>
+                    <a class = "dropdown-item" href = "{{ url_for('general_all') }}">General</a>
+                  </li>
+                  <li>
+                    <a class = "dropdown-item" href = "{{ url_for('fstudygroups_all') }}">Find Study Groups</a>
+                  </li>
+                  <li>
+                    <hr class = "dropdown-divider"/>
+                  </li>
+                  <li>
+                    <a class = "dropdown-item" href = "#"><b>Languages</b></a>
+                  </li>
+                  <li>
+                    <hr class = "dropdown-divider"/>
+                  </li>
+                  <li>
+                    <a class = "dropdown-item" href = "{{ url_for('english_all') }}">English</a>
+                  </li>
+                  <li>
+                    <a class = "dropdown-item" href = "{{ url_for('korean_all') }}">Korean</a>
+                  </li>
+                  <li>
+                    <a class = "dropdown-item" href = "{{ url_for('others_all') }}">Others</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <!-- Left links -->
+          </div>
+          <!-- Left elements -->
+
+          <!-- Right elements -->
+          <ul class = "navbar-nav flex-row">
+            <li class = "nav-item dropdown me-3 me-lg-1">
+              <a
+                class = "nav-link dropdown-toggle hidden-arrow"
+                href = "#"
+                id = "navbarDropdownMenuLink"
+                role = "button"
+                data-mdb-toggle = "dropdown"
+                aria-expanded = "false"
+              >
+                <i class = "fas fa-comments fa-lg"></i>
+              </a>
+            </li>
+            <!-- Avatar -->
+            <li class = "nav-item dropdown">
+              <a
+                class = "nav-link dropdown-toggle d-flex align-items-center"
+                href = "#"
+                id = "navbarDropdownMenuLink"
+                role = "button"
+                data-mdb-toggle = "dropdown"
+                aria-expanded = "false"
+              >
+                <img
+                  src = "https://mdbcdn.b-cdn.net/img/Photos/Avatars/img (31).webp"
+                  class = "rounded-circle"
+                  height = "22"
+                  alt = "Portrait of a Woman"
+                  loading = "lazy"
+                />
+              </a>
+              <ul class = "dropdown-menu" aria-labelledby = "navbarDropdownMenuLink">
+                <li>
+                  <a class = "dropdown-item" href = "#">My profile</a>
+                </li>
+                <li>
+                  <a class = "dropdown-item" href = "#">Setttings</a>
+                </li>
+                <li>
+                  <a class = "dropdown-item" href = "#">Logout</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <!-- Right elements -->
+        </div>
+      </nav>
+      <!-- Navbar -->
+    </header>
+    <div id = "content">
+      <!-- Background image -->
+    <div
+    class = "p-5 text-center bg-image"
+    style = "
+        background-image: url({{ url_for('static', filename='img/background.jpg') }});
+        height: 300px;
+        margin-top: 55px;
+        "
+    >
+    <div class = "mask" style = "background-color: rgba(0, 0, 0, 0.6);">
+        <div class = "d-flex justify-content-center align-items-center h-100">
+            <div class = "text-white">
+                <h1 class = "mb-3">{% block text %} {% endblock %}</h1>
+            </div>
+        </div>
+    </div>
+</div>
+      {% block content %} {% endblock %}
+    </div>
+    <!-- Copyright -->
+    <footer>
+      <div class = "bg-dark text-center text-light p-3" style = "background-color: rgba(0, 0, 0, 0.2);">
+          © 2023 Copyright: LinguaSejong.com
+      </div>
+  </footer>
+  <!-- Copyright -->
+    <!-- MDB -->
+    <script type = "text/javascript" src = "{{ url_for('static', filename='js/mdb.min.js') }}"></script>
+  </body>
+</html>

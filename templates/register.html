@@ -1,0 +1,97 @@
+{% extends "weblayout.html" %}
+{% block title %}Lingua Sejong - Register {% endblock %}
+{% block content %}
+    <section class="vh-100 gradient-custom">
+        <div class = "container py-5 h-100">
+            <div class = "row justify-content-center align-items-center h-100">
+                <div class = "col-12 col-lg-9 col-xl-7">
+                    <div class = "card shadow-2-strong card-registration" style = "border-radius: 15px;">
+                        <div class = "card-body p-4 p-md-5">
+                            <h3 class = "mb-4 pb-2 pb-md-0 mb-md-5">Registration</h3>
+                            <form action = "" method = "POST">
+                                <div class = "row">
+                                    <div class = "col-md-6 mb-4">
+                                        <div class = "form-outline">
+                                            <input type = "text" name = "username" id = "username" class = "form-control form-control-lg"/>
+                                            <label class = "form-label" for = "username">Username</label>
+                                        </div>
+                                    </div>
+                                    <div class = "col-md-6 mb-4">
+                                        <div class = "form-outline">
+                                            <input type = "email" name = "email" id = "inputEmail" class = "form-control form-control-lg"/>
+                                            <label class = "form-label" for = "inputEmail">Email</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class = "row">
+                                    <small class = "form-text text-muted">Separate the languages with commas</small>
+                                    <div class = "col-md-6 mb-4">
+                                        <div class = "form-outline">
+                                            <input type = "text" name = "available" id = "availableLang" class = "form-control form-control-lg uc-text"/>
+                                            <label class = "form-label" for = "availableLang"> Available Language</label>
+                                        </div>
+                                    </div>
+                                    <div class = "col-md-6 mb-4">
+                                        <div class = "form-outline">
+                                            <input type = "text" name = "learning" id = "learningLang" class = "form-control form-control-lg uc-text"/>
+                                            <label class = "form-label" for = "learningLang">Learning Language</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class = "row">
+                                    <div class = "col-md-6 mb-4 pb-2">
+                                        <div class = "form-outline">
+                                            <input type = "password" name = "password1" id = "inputPassword1" class = "form-control form-control-lg"/>
+                                            <label class = "form-label" for = "inputPassword1">Password</label>
+                                        </div>
+                                    </div>
+                                    <div class = "col-md-6 mb-4 pb-2">
+                                        <div class = "form-outline">
+                                            <input type = "password" name = "password2" id = "inputPassword2" class = "form-control form-control-lg" />
+                                            <label class = "form-label" for = "inputPassword2">Repeat your password</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class = "row">
+                                    <div class = "col-md-12">
+                                        <div class = "form-outline">
+                                            <input class = "form-control form-control-lg" name = "profileimg" id = "formFileLg" type = "file"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class = "row">
+                                    <div class = "col-md-6 mb-4 pb-2">
+                                        <input class = "btn btn-dark" type = "submit" value = "Sign Up" />
+                                    </div>
+                                    <div class = "col-md-6 mb-4 pb-2">
+                                        <a href = "{{ url_for('login')}}" class = "btn btn-dark btn-block mb-4">Back to Sign in</a>
+                                    </div>
+                                    <br>
+                                    {% for message in get_flashed_messages() %}
+                                        <div class = "alert alert-info alert-dismissible fade show" role = "alert">
+                                            {{ message }}
+                                            <button type = "button" class = "btn-close" data-mdb-dismiss = "alert" aria-label = "Close"></button>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        var forceInputUppercase = function(e) {
+          let el = e.target;
+          let start = el.selectionStart;
+          let end = el.selectionEnd;
+          el.value = el.value.toUpperCase();
+          el.setSelectionRange(start, end);
+        };
+        document.querySelectorAll(".uc-text").forEach(function(current) {
+          current.addEventListener("keyup", forceInputUppercase);
+        });
+    </script>
+{% endblock %}

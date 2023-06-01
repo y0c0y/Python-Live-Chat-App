@@ -1,0 +1,39 @@
+{% extends "weblayoutactive.html" %}
+{% block title %} English - Add New Post{% endblock %}
+{% block text %} Add New Post {% endblock %}
+{% block content %}
+    <br>
+    <div class = "container py-3">
+        <div class = "card text-center">
+            <div class = "card-body">
+                <h5 class = "card-title">Posting Guidelines - Read before submitting </h5>
+                <p class = "card-text">
+                    <ol class = "list-group list-group-light list-group-numbered">
+                        <li class = "list-group-item">Please be respectful</li>
+                        <li class = "list-group-item">We are not responsible for any negative consequences resulting from a user's breach of conduct</li>
+                        <li class = "list-group-item">Please only include non-comprising contact information if you wish for other users to contact you</li>
+                    </ol>
+              </p>
+            </div>
+        </div>
+        <br>
+        <h4 class = "text-center py-3">Add New Post</h4>
+        <form method = "POST" action = "{{ url_for('english_add') }}">
+            <div class = "form-outline mb-4">
+                <input type = "text" name = "title" class = form-control>
+                <label class = "form-label">Title</label>
+            </div>
+            <div class = "form-outline mb-4">
+                <input type = "text" name = "nickname" class = form-control>
+                <label class = "form-label">Nickname</label>
+            </div>
+            <div class = "form-outline mb-4">
+                <textarea class = "form-control" name = "description" cols = "40" rows = "15"></textarea>
+                <label class = "form-label" for = "form4Example3">Description</label>
+            </div>
+            <button type = "submit" class = "btn btn-dark btn-block mb-4" name = "submit">Submit</button>
+            <br>
+        </form>
+        <a href = "{{ url_for('english_all') }}" class = "btn btn-dark">Back to Forum - English</a>
+    </div>
+{% endblock %}
