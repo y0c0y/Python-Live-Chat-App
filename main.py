@@ -11,6 +11,10 @@ from werkzeug.utils import secure_filename #for secure name
 from datetime import datetime  #datetime
 from gridfs import GridFS
 
+# Import necessary modules and packages
+from bson.objectid import ObjectId
+from werkzeug.utils import secure_filename
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "hjhjsdahhds"
 socketio = SocketIO(app)
@@ -592,23 +596,88 @@ def disconnect():
     send({"name": name, "message" : "has left the room"}, to = room)
     print(f"{name} has left the room {room}")
 
+#profile
+
 @app.route("/profile")
 def profile():
     if "email" in session:
         email = session["email"]
-        user_info = records.find_one({"email" : email})
+        user_info = records.find_one({"email": email})
         username = user_info["username"]
         available = user_info["available"]
         learning = user_info["learning"]
         bio = user_info["bio"]
         user_id = user_info["_id"]
-    profileimg = fs.find_one({"user_id" : user_id, "filename" : "profileimg"})
-    if profileimg:
-        profileimg_url = url_for("image", filename = profileimg.filename)
+        
+        profileimg = fs.find_one({"user_id": user_id, "filename": "profileimg"})
+        if profileimg:
+            profileimg_url = url_for("image", filename=profileimg.filename)
+        else:
+            profileimg_url = None
+
+        return render_template("profile.html", username=username, email=email, available=available,
+                               learning=learning, bio=bio, profileimg=profileimg_url)
     else:
-        profileimg_url = None
-    
-    return render_template("profile.html", username = username, email = email, available = available, learning = learning, bio = bio, profileimg = profileimg_url)
+        return redirect(url_for('login'))
+
+# Import necessary modules and packages
+
+@app.route("/update-profile", methods=['GET', 'POST'])
+def update_profile():
+    if "email" in session:
+        email = session["email"]
+        user_info = records.find_one({"email": email})
+        username = user_info["username"]
+        available = user_info["available"]
+        learning = user_info["learning"]
+        bio = user_info["bio"]
+        user_id = user_info["_id"]
+        profileimg = fs.find_one({"metadata.user_id": user_id})
+
+        if profileimg:
+            profileimg_url = url_for("image", filename=profileimg.filename)
+        else:
+            profileimg_url = None
+
+        if request.method == "POST":
+            new_username = request.form.get("username")
+            new_available = request.form.get("available")
+            new_learning = request.form.get("learning")
+            new_bio = request.form.get("bio")
+            new_profileimg = request.files.get("profileimg")
+
+            # 프로필 사진 업데이트
+            if new_profileimg:
+                # 이전 프로필 사진 삭제
+                if profileimg:
+                    fs.delete(profileimg._id)
+
+                # 새로운 프로필 사진 저장
+                profileimg_id = fs.put(new_profileimg, filename="profileimg", metadata={"user_id": user_id})
+            else:
+                profileimg_id = None
+
+            # 이메일을 제외한 나머지 정보 업데이트
+            records.update_one(
+                {"email": email},
+                {
+                    "$set": {
+                        "username": new_username,
+                        "available": new_available,
+                        "learning": new_learning,
+                        "bio": new_bio
+                    }
+                }
+            )
+
+            # 프로필 업데이트 후 프로필 페이지로 리디렉션
+            return redirect(url_for('profile'))
+
+        return render_template("update-profile.html", username=username, email=email, available=available,
+                               learning=learning, bio=bio, profileimg=profileimg_url)
+
+    # 로그인되지 않은 경우 로그인 페이지로 리디렉션
+    return redirect(url_for('login'))
 
 @app.route("/memberprofile/<id>")
 def memberprofile(id):
