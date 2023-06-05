@@ -102,8 +102,8 @@ def register():
                           }
             user_id = records.insert_one(user_input).inserted_id
             fs.put(profileimg, filename = 'profileimg', user_id = user_id) 
-   
-            return render_template('home.html')
+
+            return redirect(url_for('login'))
     return render_template('register.html')
 
 db = client["forum"]  #use/create "forum" database
