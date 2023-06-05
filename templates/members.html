@@ -1,0 +1,33 @@
+{% extends "weblayoutactive.html" %}
+{% block title %} Lingua Sejong - Search Members {% endblock %}
+{% block text %} Search Members {% endblock %}
+{% block content %}
+<div class="container py-4">
+    <form method="POST" action="/searchmembers">
+        <div class="form-group">
+            <input type="text" class="form-control" name="search_query" placeholder="검색어를 입력하세요">
+        </div>
+        <button type="submit" class="btn btn-primary">검색</button>
+        <button type="button" class="btn btn-secondary" onclick="location.href='/searchmembers'">초기화</button>
+    </form>
+    <table class="table" border="1">
+        <thead class="table-dark">
+            <tr>
+                <td><b>Username</b></td>
+                <td><b>Available</b></td>
+                <td><b>Learning</b></td>
+            </tr>
+        </thead>
+
+        {% for dt in data %}
+        <tbody id="myTable">
+            <tr>
+                <td><a href="{{ url_for('memberprofile', id = dt._id)}}"> {{ dt.username | e}} </a></td>
+                <td>{{ dt.available | e}}</td>
+                <td>{{ dt.learning | e}}</td>
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

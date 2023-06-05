@@ -1,8 +1,7 @@
 {% extends "weblayoutactive.html" %}
 {% block title %} Forum - English {% endblock %}
-{% block text %} Forum - English {% endblock %}
+{% block text %} English {% endblock %}
 {% block content %}
-    <br>
     <div class = "container py-4">
         <a href = "{{ url_for('english_add') }}" class = "btn btn-dark">Add New Post</a>
         <h4 class = "py-3">English - Posts</h4>
@@ -14,7 +13,6 @@
                     <td><b>Date Uploaded</b></td>
                   </tr>
             </thead>
-            
             {% for dt in data %}
             <tbody>
                 <tr>

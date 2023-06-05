@@ -1,0 +1,43 @@
+{% extends 'weblayoutactive.html' %} 
+{% block title %} Lingua Sejong - Messages {% endblock %}
+{% block text %} Messages {% endblock %}
+{% block content %}
+  <div class = "container py-5 h-100">
+    <div class = "row justify-content-center align-items-center h-100">
+      <div class = "col-12 col-lg-9 col-xl-7">
+        <div class = "card shadow-2-strong card-registration" style = "border-radius: 15px;">
+          <div class = "card-body p-4 p-md-5">
+            <h3>Enter Chat Room</h3>
+            <form method = "POST" class = "buttons">
+              <div class = "row p-2">
+                <div class = "form-outline">
+                  <input type = "text" placeholder = "Enter your username" name = "name" value = "{{name}}" class = "form-control form-control-lg"/>
+                  <label class = "form-label" for = "username">Username</label>
+                </div>
+              </div>
+              <div class = "row p-2">
+                <div class = "form-outline">
+                  <input type = "text" placeholder = "Room Code" name = "code" value = "{{code}}" class = form-control form-control-lg/>
+                  <label class = "form-label" for = "inputEmail">Room Code</label>
+                </div>
+              </div>
+              <div class = "row p-2">
+                <input class = "btn btn-dark" type = "submit" name = "join" value = "Join a Room" />
+              </div>
+              <div class = "row p-2">
+                <input class = "btn btn-dark" type = "submit" name = "create" value = "Create a Room" />
+              </div>
+              <br>                      
+              {% for message in get_flashed_messages() %}
+                <div class = "alert alert-info alert-dismissible fade show" role = "alert">
+                  {{ message }}
+                  <button type = "button" class = "btn-close" data-mdb-dismiss = "alert" aria-label = "Close"></button>
+                </div>
+              {% endfor %}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

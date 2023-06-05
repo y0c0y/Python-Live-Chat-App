@@ -1,0 +1,75 @@
+{% extends 'weblayoutactive.html' %}
+{% block title %} Lingua Sejong - Member Profile {% endblock %}
+{% block text %} Member Profile {% endblock %}
+{% block content %} 
+    <section class = "vh-500 gradient-custom-2">
+        <div class = "container py-5 h-100">
+            <div class = "row d-flex justify-content-center align-items-center h-100">
+                <div class = "col col-lg-9 col-xl-7">
+                    <div class = "card">
+                        <div class = "rounded-top text-white d-flex flex-row" style = "background-color: #000; height:200px;">
+                            <div class = "ms-4 mt-5 d-flex flex-column" style = "height: 200px; width: 150px;">
+                                <img src = "{{ profileimg }}"
+                                    alt = "Profile Image" class = "img-fluid img-thumbnail mt-4 mb-2"
+                                    style = "height: 200px; width: 150px; z-index: 1">
+                            </div>
+                            <div class = "ms-3" style = "margin-top: 130px;">
+                                <h5>{{ username }}</h5>
+                            </div>
+                        </div>
+                        <div class = "p-4 text-black" style = "background-color: #f8f9fa;">
+                        </div>
+                        <br>
+                        <div class = "card-body p-4 text-black">
+                            <div class = "mb-5">
+                                <p class = "lead fw-normal mb-1">Languages</p>
+                                    <div class = "p-4" style="background-color: #f8f9fa;">
+                                        <p class = "font-italic mb-1"><b>I want to learn : </b>{{ learning }}</p>
+                                        <p class = "font-italic mb-1"><b>I can teach : </b> {{ available }}</p>
+                                    </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class = "card-body p-4 text-black">
+                            <div class = "mb-5">
+                                <p class = "lead fw-normal mb-1">About</p>
+                                    <div class = "p-4" style="background-color: #f8f9fa;">
+                                        <p class = "font-italic mb-1">{{ bio }}</p>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <br>
+    <div class = "container">
+        <h4 class = "text-center py-3">Add Comment</h4>
+        <form method = "POST" action = "{{ url_for('comment_mem', id = user_id) }}">
+            <div class = "form-outline mb-4">
+                <input type = "text" name = "nickname" class = form-control>
+                <label class = "form-label">Nickname</label>
+            </div>
+            <div class = "form-outline mb-4">
+                <textarea class = "form-control" name = "description" cols = "40" rows = "5"></textarea>
+                <label class = "form-label" for = "form4Example3">Description</label>
+            </div>
+            <button type = "submit" class = "btn btn-dark btn-block mb-4" name = "submit">Submit</button>
+            <br>
+        </form>
+        <h4 class = "text-center py-3">Comments</h4>
+        {% for c in comments %}
+        <div class = "card py-2">
+            <div class = "card-body">
+                <h6 class = "card-subtitle mb-2 text-muted">{{ c.nickname | e}}</h6>
+                <p class = "card-text">{{ c.description | e}}</p>
+                <span class = "text-right card-text">{{ c.date | e}}</span>
+
+            </div>
+        </div>
+        <br>
+        {% endfor %}
+    </div>
+    <br>
+{% endblock %}

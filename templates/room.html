@@ -1,0 +1,75 @@
+{% extends 'weblayoutactive.html' %}
+{% block title %} Lingua Sejong - Messages {% endblock %}
+{% block text %} Messages {% endblock %}
+{% block content %}
+  <style>
+    .message-box {
+    margin-top: 20px;
+    border-color: black;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 10px;
+    background-color: whitesmoke;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    width: 80vw;
+    align-items: stretch;
+    margin-bottom: 20px;
+  }
+  </style>
+  <div class = "message-box container py-5 h-100">
+    <h2>Chat Room: {{code}}</h2>
+    <br>
+    <div class = "messages" id = "messages"></div>
+      <div class="inputs">
+        <br>
+        <input type = "text" class = "form-control" rows = "3" placeholder = "Message" name = "message" id = "message" />
+        <br>
+        <button type = "button" class = "btn btn-dark" name = "send" id = "send-btn" onClick = "sendMessage()">
+          Send
+        </button>
+      </div>
+    </div>
+  <script type = "text/javascript">
+    var socketio = io();
+
+    const messages = document.getElementById("messages");
+
+    const createMessage = (name, msg) => {
+      const content = `
+      <div class = "text">
+        <span>
+          <strong>${name}</strong>: ${msg}
+        </span>
+        <span class = "muted">
+          ${new Date().toLocaleString()}
+        </span>
+      </div>
+    ` ;
+      messages.innerHTML += content;
+    };
+
+    socketio.on("message", (data) => {
+      createMessage(data.name, data.message);
+    });
+    const message = document.getElementById("message");
+
+    const sendMessage = () => {
+      if (message.value == "") return;
+        socketio.emit("message", { data: message.value });
+        message.value = "";
+      };
+    message.addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        document.getElementById("send-btn").click();
+      }
+    });
+  </script>
+  {% for msg in messages %}
+  <script type="text/javascript">
+    createMessage("{{msg.name}}", "{{msg.message}}");
+  </script>
+  {% endfor %} 
+{% endblock %}

@@ -7,29 +7,19 @@ import bcrypt
 
 from pymongo import MongoClient  #import the pymongo
 from bson.objectid import ObjectId #import this to convert ObjectID from string to its datatype in MongoDB
+from werkzeug.utils import secure_filename #for secure name
 from datetime import datetime  #datetime
+from gridfs import GridFS
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "hjhjsdahhds"
 socketio = SocketIO(app)
 
-rooms = {}
-
-def generate_unique_code(length):
-    while True:
-        code = ""
-        for _ in range(length):
-            code += random.choice(ascii_uppercase)
-        
-        if code not in rooms:
-            break
-    
-    return code
-
 #login
 client = MongoClient("mongodb://localhost:27017/")  #connect on the "localhost" host and port 27017
 log_db = client["users"]
 records = log_db.users
+fs = GridFS(log_db, collection = "images")
 
 @app.route("/", methods=["POST", "GET"])
 def login():
@@ -63,7 +53,8 @@ def register():
         learning = request.form.get("learning")
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
-        #profileimg = request.form.get("profileimg")
+        bio = request.form.get("bio")
+        profileimg = request.files.get("profileimg") 
         
         user_found = records.find_one({"username": user})
         email_found = records.find_one({"email": email})
@@ -85,10 +76,12 @@ def register():
         if not password2:
             flash("Please enter your password")
             return render_template('register.html')
-        #if not profileimg:
+        if not bio:
+            flash("Please enter your bio")
+            return render_template('register.html')
+        if not profileimg:
             flash("Please upload your image")
             return render_template('register.html')
-
         if user_found:
             flash("There is already a user that exists by that username")
             return render_template('register.html')
@@ -105,9 +98,10 @@ def register():
                           'available' : available,
                           'learning' : learning,
                           'password' : hashed,
-                          #'profileimg' : profileimg
+                          'bio' : bio
                           }
-            records.insert_one(user_input)
+            user_id = records.insert_one(user_input).inserted_id
+            fs.put(profileimg, filename = 'profileimg', user_id = user_id) 
    
             return render_template('home.html')
     return render_template('register.html')
@@ -123,6 +117,7 @@ comments_fst = db.comments_fst  # use/create "comments_gen" collection
 comments_eng = db.comments_eng  #use/create "comments_gen" collection
 comments_kor = db.comments_kor  #use/create "comments_gen" collection
 comments_oth = db.comments_oth  #use/create "comments_gen" collection
+comments_mem = log_db.comments_mem  #use/create "comments_mem" collection
 
 @app.route("/forum/index")
 def forumhome():
@@ -204,7 +199,6 @@ def fstudygroups_read(id):
         "fstudygroups-read.html", data = fstudygroups_data, comments = all_comments_fst_list
     )
 
-
 #only accessible if user is logged in, else redirects to login page
 @app.route("/forum/fstudygroups/addpost", methods = ["GET", "POST"])
 def fstudygroups_add():
@@ -233,14 +227,12 @@ def fstudygroups_add():
     #else (not POST aka GET) then show the new input form
     return render_template("fstudygroups-add.html")
 
-
 @app.route("/forum/english")
 def english_all():
     all_english = english.find()  #get all projects data
     all_english_list = list(all_english)  #convert the data into list
 
     return render_template("english.html", data = all_english_list)
-
 
 @app.route("/forum/english/read/<id>")
 def english_read(id):
@@ -363,7 +355,6 @@ def others_read(id):
         "others-read.html", data = others_data, comments = all_comments_oth_list
     )
 
-
 #only accessible if user is logged in, else redirects to login page
 @app.route("/forum/others/addpost", methods = ["GET", "POST"])
 def others_add():
@@ -438,7 +429,6 @@ def comment_add_fst(id):
 
         return redirect(url_for("fstudygroups_read", id = postid))
 
-
 @app.route("/forum/english/comment/add/<id>", methods = ["POST"])
 def comment_add_eng(id):
     #handling a form is submitted via POST aka updating the project data
@@ -462,7 +452,6 @@ def comment_add_eng(id):
 
         return redirect(url_for("english_read", id = postid))
 
-
 @app.route("/forum/korean/comment/add/<id>", methods = ["POST"])
 def comment_add_kor(id):
     #handling a form is submitted via POST aka updating the project data
@@ -485,8 +474,7 @@ def comment_add_kor(id):
         comments_kor.insert_one(new_project_value)
 
         return redirect(url_for("korean_read", id = postid))
-
-
+    
 @app.route("/forum/others/comment/add/<id>", methods = ["POST"])
 def comment_add_oth(id):
     #handling a form is submitted via POST aka updating the project data
@@ -509,8 +497,195 @@ def comment_add_oth(id):
         comments_oth.insert_one(new_project_value)
 
         return redirect(url_for("others_read", id = postid))
+    
+rooms = {}
+
+def generate_unique_code(length):
+    while True:
+        code = ""
+        for _ in range(length):
+            code += random.choice(ascii_uppercase)
+        
+        if code not in rooms:
+            break
+    
+    return code
+    
+@app.route("/messages", methods = ["POST", "GET"])
+def chathome():
+    session.clear()
+    if request.method == "POST":
+        name = request.form.get("name")
+        code = request.form.get("code")
+        join = request.form.get("join", False)
+        create = request.form.get("create", False)
+
+        if not name:
+            flash("Please enter your username")
+            return render_template("chathome.html", code = code, name = name)
+
+        if join != False and not code:
+            flash("Please enter a room code")
+            return render_template("chathome.html", code = code, name = name)
+        room = code
+        if create != False:
+            room = generate_unique_code(4)
+            rooms[room] = {"members": 0, "messages": []}
+        elif code not in rooms:
+            flash("Room does not exist")
+            return render_template("chathome.html", code = code, name = name)
+        session["room"] = room
+        session["name"] = name
+
+        return redirect(url_for("room"))
+
+    return render_template("chathome.html")
+
+@app.route("/messages/room")
+def room():
+    room = session.get("room")
+    if room is None or session.get("name") is None or room not in rooms:
+        return redirect(url_for("chathome"))
+
+    return render_template("room.html", code = room, messages = rooms[room]["messages"])
+
+@socketio.on("message")
+def message(data):
+    room = session.get("room")
+    if room not in rooms:
+        return 
+    
+    content = {
+        "name": session.get("name"),
+        "message": data["data"]
+    }
+    send(content, to = room)
+    rooms[room]["messages"].append(content)
+    print(f"{session.get('name')} said: {data['data']}")
+
+@socketio.on("connect")
+def connect(auth):
+    room = session.get("room")
+    name = session.get("name")
+    if not room or not name:
+        return
+    if room not in rooms:
+        leave_room(room)
+        return
+    
+    join_room(room)
+    send({"name": name, "message": "has entered the room"}, to = room)
+    rooms[room]["members"] += 1
+    print(f"{name} joined room {room}")
+
+@socketio.on("disconnect")
+def disconnect():
+    room = session.get("room")
+    name = session.get("name")
+    leave_room(room)
+
+    if room in rooms:
+        rooms[room]["members"] -= 1
+        if rooms[room]["members"] <= 0:
+            del rooms[room]
+    
+    send({"name": name, "message" : "has left the room"}, to = room)
+    print(f"{name} has left the room {room}")
+
+@app.route("/profile")
+def profile():
+    if "email" in session:
+        email = session["email"]
+        user_info = records.find_one({"email" : email})
+        username = user_info["username"]
+        available = user_info["available"]
+        learning = user_info["learning"]
+        bio = user_info["bio"]
+        user_id = user_info["_id"]
+    profileimg = fs.find_one({"user_id" : user_id, "filename" : "profileimg"})
+    if profileimg:
+        profileimg_url = url_for("image", filename = profileimg.filename)
+    else:
+        profileimg_url = None
+    
+    return render_template("profile.html", username = username, email = email, available = available, learning = learning, bio = bio, profileimg = profileimg_url)
+
+@app.route("/memberprofile/<id>")
+def memberprofile(id):
+        #convert from string to ObjectId:
+        _id_converted = ObjectId(id)
+        search_filter = {
+            "_id": _id_converted
+        }  #_id is key and _id_converted is the converted _id
+        member_data = records.find_one(
+            search_filter
+        )  #get one project data matched with _id
+        username = member_data["username"]
+        available = member_data["available"]
+        learning = member_data["learning"]
+        bio = member_data["bio"]
+        user_id = member_data["_id"]
+        profileimg = fs.find_one({"user_id" : user_id, "filename" : "profileimg"})
+        if profileimg:
+            profileimg_url = url_for("image", filename = profileimg.filename)
+        else:
+            profileimg_url = None
+        all_comments_mem = comments_mem.find({"postid": id})
+        all_comments_mem_list = list(all_comments_mem)
+
+        return render_template("memberprofile.html", user_id = user_id, username = username, available = available, learning = learning, bio = bio, profileimg = profileimg_url, comments = all_comments_mem_list)
+
+@app.route("/memberprofile/comment/add/<id>", methods = ["POST"])
+def comment_mem(id):
+    #handling a form is submitted via POST aka updating the project data
+    if request.method == "POST":
+        #get data from a submitted based on the 'name' in the input form
+        postid = id
+        nickname = request.form["nickname"]
+        description = request.form["description"]
+
+        #prepare new project data
+        #{"key": new value }
+        new_project_value = {
+            "postid": postid,
+            "nickname": nickname,
+            "description": description,
+            "date": datetime.now(),
+        }
+
+        #run the query to save one project data
+        comments_mem.insert_one(new_project_value)
+
+        return redirect(url_for("memberprofile", id = postid))
+    
+@app.route("/image/<filename>")
+def image(filename):
+    image_data = fs.get_last_version(filename = filename)
+    if image_data:
+        response = app.response_class(image_data.read(), mimetype = 'application/octet-stream')
+        response.headers.set('Content-Disposition', 'attachement', filename = filename)
+        return response
+    else:
+        return "Image not found"
+
+@app.route("/searchmembers", methods=['GET', 'POST'])
+def members():
+    if request.method == 'POST':
+        search_query = request.form.get('search_query')  # 검색어 가져오기
+        if search_query:
+            query = {"username": {"$regex": search_query, "$options": "i"}}  # 사용자 이름에 검색어가 포함된 멤버를 찾는 예시
+            all_members = records.find(query)
+        else:
+            all_members = records.find()  # 검색어가 없으면 모든 멤버 정보를 데이터베이스에서 조회
+    else:
+        all_members = records.find()  # GET 요청이면 모든 멤버 정보를 데이터베이스에서 조회
+
+    all_members_list = list(all_members)  # 조회된 정보를 리스트로 변환
+
+    # Render the members.html template with the members data
+    return render_template("members.html", data = all_members_list)  
 
 #put the following code at the end of 'app.py' script
 if __name__ == '__main__':
     app.run(host = "0.0.0.0", port = 5000, debug = True) #debug is True, change host and port as needed
-    socketio.run(app, debug=True)
+    socketio.run(app, debug = True)

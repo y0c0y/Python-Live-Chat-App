@@ -21,8 +21,24 @@
     <link rel = "stylesheet" href = "{{ url_for('static', filename='css/mdb.min.css') }}"/>
   </head>
   <body>
-    {% block content %} 
-    {% endblock %}
+    <!-- Background image -->
+    <div
+      class = "p-5 text-center bg-image"
+      style = "
+        background-image: url('static/img/background.jpg');
+        height: 250px;
+        margin-top: 55px;
+        "
+    >
+      <div class = "mask" style = "background-color: rgba(0, 0, 0, 0.6);">
+        <div class = "d-flex justify-content-center align-items-center h-100">
+          <div class = "text-white">
+            <h1 class = "mb-3"> Lingua Sejong</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% block content %} {% endblock %}
     </div>
     <!-- Copyright -->
     <footer>
